@@ -1,0 +1,26 @@
+<idea-plugin>
+    <id>com.epam.healenium.hlm-idea</id>
+    <name>Healenium</name>
+    <version>1.0</version>
+    <vendor email="knpdeveloper@gmail.com" url=""></vendor>
+
+    <description><![CDATA[
+        IntelliJ IDEA plugin for updating selenium locators via context menu.
+    ]]></description>
+
+    <!-- please see https://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
+    <idea-version since-build="143.0"/>
+
+    <depends>com.intellij.modules.lang</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+    </extensions>
+
+    <actions>
+        <group id="HealingResultsGroup">
+            <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+            <action class="com.epam.healenium.GetHealingAction" id="HealingAction" text="Healing Results" description="Get results from healing server"/>
+        </group>
+    </actions>
+
+</idea-plugin>
