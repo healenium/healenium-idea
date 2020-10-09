@@ -35,6 +35,7 @@ import com.intellij.psi.search.searches.MethodReferencesSearch;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.util.PsiTreeUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -54,7 +55,7 @@ public class GetHealingAction extends AnAction {
     private boolean isFromMethod = true;
 
     public GetHealingAction() {
-        super(null, null, new ImageIcon(GetHealingAction.class.getClassLoader().getResource("icon/healenium.png")));
+        super(StringUtils.EMPTY, StringUtils.EMPTY, new ImageIcon(GetHealingAction.class.getClassLoader().getResource("icon/healenium.png")));
         notifier = new HealingNotifier();
     }
 
