@@ -1,5 +1,5 @@
 plugins {
-    id "org.jetbrains.intellij" version '0.4.1'
+    id "org.jetbrains.intellij" version '0.5.0'
 }
 
 apply plugin: 'org.jetbrains.intellij'
@@ -9,7 +9,7 @@ sourceCompatibility = 1.8
 
 intellij {
     plugins 'java'
-    version '2019.3'
+    version '2020.2.3'
     pluginName 'Healenium'
     updateSinceUntilBuild false
 }
@@ -22,12 +22,16 @@ repositories {
 }
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.9'
-    compile group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.3.1'
+    testImplementation group: 'junit', name: 'junit', version: '4.12'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.9'
+    implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.3.1'
 
-    compile 'org.projectlombok:lombok:1.18.8'
+    implementation 'org.projectlombok:lombok:1.18.8'
     annotationProcessor 'org.projectlombok:lombok:1.18.8'
-    testCompile 'org.projectlombok:lombok:1.18.8'
+    testImplementation 'org.projectlombok:lombok:1.18.8'
     testAnnotationProcessor "org.projectlombok:lombok:1.18.8"
+}
+
+publishPlugin {
+    token = System.getenv("ORG_GRADLE_PROJECT_intellijPublishToken")
 }
