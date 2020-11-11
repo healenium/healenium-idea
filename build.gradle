@@ -1,5 +1,5 @@
 plugins {
-    id "org.jetbrains.intellij" version '0.4.1'
+    id "org.jetbrains.intellij" version '0.4.22'
 }
 
 apply plugin: 'org.jetbrains.intellij'
@@ -22,12 +22,13 @@ repositories {
 }
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.9'
-    compile group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.3.1'
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.11.2")
+    implementation("com.squareup.okhttp3:okhttp:4.9.0")
 
-    compile 'org.projectlombok:lombok:1.18.8'
-    annotationProcessor 'org.projectlombok:lombok:1.18.8'
-    testCompile 'org.projectlombok:lombok:1.18.8'
-    testAnnotationProcessor "org.projectlombok:lombok:1.18.8"
+    compileOnly('org.projectlombok:lombok:1.18.12')
+    annotationProcessor('org.projectlombok:lombok:1.18.12')
+    testImplementation('org.projectlombok:lombok:1.18.12')
+    testAnnotationProcessor("org.projectlombok:lombok:1.18.12")
+
+    testImplementation ("junit:junit:4.12")
 }
