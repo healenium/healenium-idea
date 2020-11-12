@@ -1,17 +1,19 @@
 <idea-plugin>
     <id>com.epam.healenium.hlm-idea</id>
     <name>Healenium</name>
-    <version>1.0</version>
-    <vendor email="knpdeveloper@gmail.com" url=""></vendor>
+    <version>1.0.2</version>
+    <vendor email="SpecialEPM-DTSOHealenium@epam.com" url="https://healenium.io/"></vendor>
 
     <description><![CDATA[
         IntelliJ IDEA plugin for updating selenium locators via context menu.
+        Healenium improves stability of Selenium-based test cases, handling changes of updated web elements.
     ]]></description>
 
     <!-- please see https://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
-    <idea-version since-build="143.0"/>
+    <idea-version since-build="182.0"/>
 
     <depends>com.intellij.modules.lang</depends>
+    <depends>com.intellij.modules.java</depends>
 
     <extensions defaultExtensionNs="com.intellij">
     </extensions>
