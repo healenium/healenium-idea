@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.epam.healenium.hlm-idea</id>
     <name>Healenium</name>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
     <vendor email="SpecialEPM-DTSOHealenium@epam.com" url="https://healenium.io/"></vendor>
 
     <description><![CDATA[
