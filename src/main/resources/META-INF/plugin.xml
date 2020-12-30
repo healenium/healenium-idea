@@ -20,8 +20,18 @@
 
     <actions>
         <group id="HealingResultsGroup">
+            <action class="com.epam.healenium.GetHealingAction" id="HealingAction" text="Healing Results"
+                    description="Get results from healing server"/>
+            <separator/>
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
-            <action class="com.epam.healenium.GetHealingAction" id="HealingAction" text="Healing Results" description="Get results from healing server"/>
+        </group>
+        <group id="HealingClassResultsGroup">
+            <separator/>
+            <action class="com.epam.healenium.GetClassHealingAction" id="ClassHealingAction"
+                    text="Healing File Results"
+                    description="Get results from class healing server"/>
+            <separator/>
+            <add-to-group group-id="CutCopyPasteGroup" anchor="first"/>
         </group>
     </actions>
 

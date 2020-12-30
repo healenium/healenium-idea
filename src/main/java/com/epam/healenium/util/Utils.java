@@ -6,14 +6,13 @@ import com.intellij.openapi.fileEditor.FileEditorProvider;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.fileEditor.ex.FileEditorProviderManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.net.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 /**
  * Created by nkobzev.
@@ -25,7 +24,6 @@ public class Utils {
     }
 
     /**
-     *
      * @param filePath
      * @param project
      */
@@ -36,7 +34,7 @@ public class Utils {
                 VirtualFile file = LocalFileSystem.getInstance().refreshAndFindFileByPath(filePath);
                 if (file != null && file.isValid()) {
                     FileEditorProvider[] providers = FileEditorProviderManager.getInstance()
-                        .getProviders(project, file);
+                            .getProviders(project, file);
                     if (providers.length != 0) {
                         OpenFileDescriptor descriptor = new OpenFileDescriptor(project, file);
                         FileEditorManager.getInstance(project).openTextEditor(descriptor, false);
@@ -47,6 +45,7 @@ public class Utils {
     }
 
     /**
+     *
      */
     public static void openDirectory(String directory) {
         File file = new File(directory);
@@ -66,7 +65,7 @@ public class Utils {
     public static boolean isConnected(String url) {
         try {
             HttpURLConnection conn =
-                (HttpURLConnection) new URL(url).openConnection();
+                    (HttpURLConnection) new URL(url).openConnection();
             conn.setConnectTimeout(3000);
             conn.setReadTimeout(3000);
             conn.setRequestMethod("GET");
