@@ -8,12 +8,9 @@ import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiAnnotation;
-import com.intellij.psi.PsiAnnotationMemberValue;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementFactory;
 import com.intellij.psi.PsiExpression;
@@ -30,20 +27,16 @@ import com.intellij.psi.util.PsiTreeUtil;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.ImageIcon;
+import javax.swing.*;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public abstract class AbstractHealingAction extends AnAction {
 
     protected PsiElementFactory factory;
-    protected PsiAnnotationMemberValue methodCall;
     protected Project project;
-    protected Set<HealingDto> data = new HashSet<>();
     protected HealingNotifier notifier;
-    protected boolean isFromMethod;
     protected int count = 0;
 
     public AbstractHealingAction() {
@@ -52,71 +45,51 @@ public abstract class AbstractHealingAction extends AnAction {
         notifier = new HealingNotifier();
     }
 
-    protected abstract void showResultsAndUpdate(@NotNull AnActionEvent e, Set<HealingResultDto> locators);
-
-    protected void actionPerformedPerElement(@NotNull AnActionEvent e, PsiElement element) {
+    protected HealingDto actionPerformedPerElement(@NotNull AnActionEvent e, PsiElement element) {
         project = e.getData(CommonDataKeys.PROJECT);
         // метод в котором инициировали поиск результатов хилинга
         PsiMethod method = PsiTreeUtil.getParentOfType(element, PsiMethod.class);
 
         // получаем локатор
         PsiLiteralExpression literalExpression = PsiTreeUtil.getParentOfType(element, PsiLiteralExpression.class);
-        if (literalExpression == null) return;
+        if (literalExpression == null) return null;
         String locator = (String) literalExpression.getValue();
         String className = method != null
-            // получаем полное имя класса
-            ? method.getContainingClass().getQualifiedName()
-            // получаем полное имя класса. Т.к метода нет, значит мы нв верхнеуровневом свойстве, и проходить по дереву не нужно
-            : PsiTreeUtil.getParentOfType(element, PsiMember.class).getContainingClass().getQualifiedName();
+                // получаем полное имя класса
+                ? method.getContainingClass().getQualifiedName()
+                // получаем полное имя класса. Т.к метода нет, значит мы нв верхнеуровневом свойстве, и проходить по дереву не нужно
+                : PsiTreeUtil.getParentOfType(element, PsiMember.class).getContainingClass().getQualifiedName();
 
         // запрашиваем исправленные локаторы
-        data = new HealingClient().makeCall(locator, className);
-        if (data.isEmpty()) return;
+        Set<HealingDto> data = new HealingClient().makeCall(locator, className);
+        if (data.isEmpty()) return null;
 
         if (method == null && data.size() > 1) {
             notifier.notify("Can't detect healing results", NotificationType.ERROR);
-            return;
+            return null;
         }
 
-        count++;
-        isFromMethod = true;
-        Set<HealingResultDto> locators;
-        if (method == null || data.size() == 1) {
-            // если метод отсутствует, или результат только один
-            locators = data.stream()
-                    .flatMap(it -> it.getResults().stream())
-                    .collect(Collectors.toSet());
-        } else {
+        if (method != null && data.size() != 1) {
             // проходим по классу вверх, в поисках нужного метода
-            locators = findProperMethod(PsiTreeUtil.getParentOfType(element, PsiMethod.class));
+            data.iterator().next().setResults(findProperMethod(data, PsiTreeUtil.getParentOfType(element, PsiMethod.class)));
         }
 
         // получим выражение точки выбора
-        methodCall = PsiTreeUtil.getParentOfType(element, PsiMethodCallExpression.class);
+        PsiElement methodCall = PsiTreeUtil.getParentOfType(element, PsiMethodCallExpression.class);
         if (methodCall == null) {
             methodCall = PsiTreeUtil.getParentOfType(element, PsiAnnotation.class);
-            isFromMethod = false;
         }
 
         if (methodCall != null) {
             factory = JavaPsiFacade.getInstance(project).getElementFactory();
         }
 
-        if (!locators.isEmpty()) {
-            showResultsAndUpdate(e, locators);
-        }
+        count++;
+        return data.iterator().next().setMethodCall(methodCall);
     }
 
-    protected void updateLocators(HealingResultDto value) {
-        CommandProcessor.getInstance().executeCommand(project,
-                () -> ApplicationManager.getApplication().runWriteAction(() -> {
-                    PsiExpression locatorExpression = factory.createExpressionFromText("\"" + value.getLocator().getValue() + "\"", null);
-                    updateLocatorValue(methodCall, locatorExpression, isFromMethod);
-                }), "Updated locator", null);
-    }
-
-    protected Set<HealingResultDto> findProperMethod(PsiMethod referenceMethod) {
-        Set<HealingResultDto> result = findResults(referenceMethod);
+    protected Set<HealingResultDto> findProperMethod(Set<HealingDto> data, PsiMethod referenceMethod) {
+        Set<HealingResultDto> result = findResults(data, referenceMethod);
         if (!result.isEmpty()) return result;
         SearchScope searchScope = ProjectScope.getContentScope(project);
         Collection<PsiReference> refs = MethodReferencesSearch
@@ -127,21 +100,21 @@ public abstract class AbstractHealingAction extends AnAction {
             PsiMethodCallExpression expression = PsiTreeUtil.getParentOfType(reference.getElement(), PsiMethodCallExpression.class);
             if (expression != null) {
                 PsiMethod targetMethod = PsiTreeUtil.getParentOfType(expression.getMethodExpression(), PsiMethod.class);
-                return findProperMethod(targetMethod);
+                return findProperMethod(data, targetMethod);
             }
         }
         return result;
     }
 
-    protected Set<HealingResultDto> findResults(PsiMethod method) {
+    protected Set<HealingResultDto> findResults(Set<HealingDto> data, PsiMethod method) {
         return data.stream()
                 .filter(it -> it.getMethodName().equals(method.getName()))
                 .flatMap(it -> it.getResults().stream())
                 .collect(Collectors.toSet());
     }
 
-    protected void updateLocatorValue(PsiAnnotationMemberValue methodCall, PsiExpression locatorExpression, boolean isMethod) {
-        if (isMethod) {
+    protected void updateLocatorValue(PsiElement methodCall, PsiExpression locatorExpression) {
+        if (methodCall instanceof PsiMethodCallExpression) {
             updateMethodLocatorValue((PsiMethodCallExpression) methodCall, locatorExpression, factory.createIdentifier("cssSelector"));
         } else {
             updateAnnotationLocatorValue((PsiAnnotation) methodCall, locatorExpression, factory.createIdentifier("css"));
