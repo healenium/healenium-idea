@@ -11,7 +11,6 @@ import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiExpression;
 import com.intellij.psi.PsiFile;
-import org.apache.commons.imaging.formats.tiff.TiffImageData;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
