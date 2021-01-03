@@ -62,6 +62,8 @@ public abstract class AbstractHealingAction extends AnAction {
 
         // запрашиваем исправленные локаторы
         Set<HealingDto> data = new HealingClient().makeCall(locator, className);
+        filterNonSuccessHealingResults(data);
+
         if (data.isEmpty()) return null;
 
         if (method == null && data.size() > 1) {
@@ -69,9 +71,10 @@ public abstract class AbstractHealingAction extends AnAction {
             return null;
         }
 
+        HealingDto healingDto = data.iterator().next();
         if (method != null && data.size() != 1) {
             // проходим по классу вверх, в поисках нужного метода
-            data.iterator().next().setResults(findProperMethod(data, PsiTreeUtil.getParentOfType(element, PsiMethod.class)));
+            healingDto.setResults(findProperMethod(data, method));
         }
 
         // получим выражение точки выбора
@@ -85,7 +88,14 @@ public abstract class AbstractHealingAction extends AnAction {
         }
 
         count++;
-        return data.iterator().next().setMethodCall(methodCall);
+        return healingDto.setMethodCall(methodCall);
+    }
+
+    private void filterNonSuccessHealingResults(Set<HealingDto> data) {
+        if (!data.isEmpty()) {
+            data.forEach(dto -> dto.getResults().removeIf(r -> !r.isSuccessHealing()));
+            data.removeIf(d -> d.getResults().isEmpty());
+        }
     }
 
     protected Set<HealingResultDto> findProperMethod(Set<HealingDto> data, PsiMethod referenceMethod) {

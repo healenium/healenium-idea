@@ -11,6 +11,7 @@ public class HealingResultDto {
 
     private Locator locator;
     private Double score;
+    private boolean successHealing;
     private LocalDateTime createDate;
 
 }
