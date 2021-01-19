@@ -61,7 +61,7 @@ public abstract class AbstractHealingAction extends AnAction {
                 : PsiTreeUtil.getParentOfType(element, PsiMember.class).getContainingClass().getQualifiedName();
 
         // запрашиваем исправленные локаторы
-        Set<HealingDto> data = new HealingClient().makeCall(locator, className);
+        Set<HealingDto> data = new HealingClient().makeCall(project, locator, className);
         filterNonSuccessHealingResults(data);
 
         if (data.isEmpty()) return null;

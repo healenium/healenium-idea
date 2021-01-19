@@ -8,11 +8,19 @@ import com.intellij.openapi.fileEditor.ex.FileEditorProviderManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.search.PsiShortNamesCache;
+import okhttp3.HttpUrl;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * Created by nkobzev.
@@ -42,6 +50,47 @@ public class Utils {
                 }
             }
         });
+    }
+
+    public static HttpUrl.Builder getURLBuilder(Project project) {
+        return HttpUrl.parse("http://"
+                + getHealeniumPropertyValue(project, "serverHost") + ":"
+                + getHealeniumPropertyValue(project, "serverPort")
+                + "/healenium/healing")
+                .newBuilder();
+    }
+
+    public static String getHealeniumPropertyValue(Project project, String key) {
+        PsiFile[] files = PsiShortNamesCache.getInstance(project).getFilesByName("healenium.properties");
+        if (files != null && files.length > 0) {
+            List<PsiElement> psiElementList = Utils.iterableTree(files[0].getChildren(), null);
+            return psiElementList.stream()
+                    .filter(element -> element.getFirstChild() != null
+                            && element.getLastChild() != null
+                            && key.equals(element.getFirstChild().getText()))
+                    .findFirst()
+                    .map(element -> element.getLastChild().getText())
+                    .get();
+        }
+        return null;
+    }
+
+    public static List<PsiElement> iterableTree(PsiElement[] children, Predicate<PsiElement> predicate) {
+        List<PsiElement> psiElementList = new ArrayList();
+        if (children == null || children.length == 0) {
+            return psiElementList;
+        }
+
+        Arrays.stream(children).
+                forEach(element -> {
+                    if (predicate == null || predicate.test(element)) {
+                        psiElementList.add(element);
+                    }
+                    psiElementList.addAll(iterableTree(element.getChildren(), predicate));
+
+                });
+
+        return psiElementList;
     }
 
     /**

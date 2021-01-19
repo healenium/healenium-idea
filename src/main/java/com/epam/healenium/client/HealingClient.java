@@ -1,10 +1,12 @@
 package com.epam.healenium.client;
 
 import com.epam.healenium.model.HealingDto;
+import com.epam.healenium.util.Utils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.intellij.openapi.project.Project;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
@@ -21,21 +23,13 @@ public class HealingClient {
             .registerModule(new JavaTimeModule())
             .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
-    private String host = "localhost";
-    private Integer port = 7878;
-
     public HealingClient() {
     }
 
-    public HealingClient(String host, Integer port) {
-        this.host = host;
-        this.port = port;
-    }
-
-    public Set<HealingDto> makeCall(String selector, String className){
-        try{
+    public Set<HealingDto> makeCall(Project project, String selector, String className) {
+        try {
             //TODO: Need add config UI section
-            HttpUrl.Builder urlBuilder = HttpUrl.parse("http://"+ host+":"+port+"/healenium/healing").newBuilder();
+            HttpUrl.Builder urlBuilder = Utils.getURLBuilder(project);
             urlBuilder.addQueryParameter("locator", selector);
             urlBuilder.addQueryParameter("className", className);
             String url = urlBuilder.build().toString();
@@ -43,8 +37,9 @@ public class HealingClient {
             Request request = new Request.Builder().url(url).build();
             Response response = new OkHttpClient().newCall(request).execute();
             String result = response.body().string();
-            return mapper.readValue(result, new TypeReference<Set<HealingDto>>(){});
-        } catch (Exception ex){
+            return mapper.readValue(result, new TypeReference<Set<HealingDto>>() {
+            });
+        } catch (Exception ex) {
             return Collections.emptySet();
         }
     }
