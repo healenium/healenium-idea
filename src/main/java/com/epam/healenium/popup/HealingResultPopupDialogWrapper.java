@@ -5,17 +5,19 @@ import com.epam.healenium.model.HealingResultDto;
 import com.intellij.openapi.ui.DialogWrapper;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.BoxLayout;
-import javax.swing.JCheckBox;
+import javax.swing.*;
+import java.awt.*;
+import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class HealingResultPopupDialogWrapper extends DialogWrapper {
 
     private OnIOkClickListener okClickListener;
     private Set<HealingDto> healingDtoSet;
+    private JComponent jComponent;
 
     public HealingResultPopupDialogWrapper(Set<HealingDto> healingDtoSet,
                                            OnIOkClickListener okClickListener) {
@@ -38,10 +40,12 @@ public class HealingResultPopupDialogWrapper extends DialogWrapper {
                     .orElse(data.getResults().iterator().next())
                     .getLocator().getValue();
             JCheckBox checkBox = new JCheckBox(data.getLocator() + "  ->  " + locatorValue);
+            checkBox.setName(data.getLocator());
             checkBox.setSelected(true);
             dialogPanel.add(checkBox);
         });
 
+        this.jComponent = dialogPanel;
         return dialogPanel;
     }
 
@@ -51,7 +55,17 @@ public class HealingResultPopupDialogWrapper extends DialogWrapper {
 
     @Override
     public void doOKAction() {
+        filterUnselectedElements(healingDtoSet);
         okClickListener.onOkClick(healingDtoSet);
         super.doOKAction();
+    }
+
+    private void filterUnselectedElements(Set<HealingDto> healingDtoSet) {
+        List<String> unselectedLocators = Arrays.stream(jComponent.getComponents())
+                .map(JCheckBox.class::cast)
+                .filter(c -> !c.isSelected())
+                .map(Component::getName)
+                .collect(Collectors.toList());
+        healingDtoSet.removeIf(dto -> unselectedLocators.contains(dto.getLocator()));
     }
 }
