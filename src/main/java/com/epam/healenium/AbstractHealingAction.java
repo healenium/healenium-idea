@@ -4,7 +4,6 @@ import com.epam.healenium.client.HealingClient;
 import com.epam.healenium.model.HealingDto;
 import com.epam.healenium.model.HealingResultDto;
 import com.epam.healenium.popup.HealingNotifier;
-import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
@@ -47,37 +46,30 @@ public abstract class AbstractHealingAction extends AnAction {
 
     protected HealingDto actionPerformedPerElement(@NotNull AnActionEvent e, PsiElement element) {
         project = e.getData(CommonDataKeys.PROJECT);
-        // метод в котором инициировали поиск результатов хилинга
+        // receive method
         PsiMethod method = PsiTreeUtil.getParentOfType(element, PsiMethod.class);
 
-        // получаем локатор
+        // receive locator
         PsiLiteralExpression literalExpression = PsiTreeUtil.getParentOfType(element, PsiLiteralExpression.class);
         if (literalExpression == null) return null;
         String locator = (String) literalExpression.getValue();
         String className = method != null
-                // получаем полное имя класса
+                // receive full class name
                 ? method.getContainingClass().getQualifiedName()
-                // получаем полное имя класса. Т.к метода нет, значит мы нв верхнеуровневом свойстве, и проходить по дереву не нужно
+                // пreceive full class name. because method is null, so we on the top level and no need run the tree.
                 : PsiTreeUtil.getParentOfType(element, PsiMember.class).getContainingClass().getQualifiedName();
 
-        // запрашиваем исправленные локаторы
+        // get Healed locators
         Set<HealingDto> data = new HealingClient().makeCall(locator, className);
         filterNonSuccessHealingResults(data);
 
         if (data.isEmpty()) return null;
 
-        if (method == null && data.size() > 1) {
-            notifier.notify("Can't detect healing results", NotificationType.ERROR);
-            return null;
-        }
-
         HealingDto healingDto = data.iterator().next();
         if (method != null && data.size() != 1) {
-            // проходим по классу вверх, в поисках нужного метода
             healingDto.setResults(findProperMethod(data, method));
         }
 
-        // получим выражение точки выбора
         PsiElement methodCall = PsiTreeUtil.getParentOfType(element, PsiMethodCallExpression.class);
         if (methodCall == null) {
             methodCall = PsiTreeUtil.getParentOfType(element, PsiAnnotation.class);
