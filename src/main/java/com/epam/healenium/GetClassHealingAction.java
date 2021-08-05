@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+@SuppressWarnings("unchecked")
 public class GetClassHealingAction extends AbstractHealingAction {
 
     public GetClassHealingAction() {

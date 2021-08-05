@@ -34,7 +34,7 @@ public class GetHealingAction extends AbstractHealingAction {
         CaretModel caretModel = editor.getCaretModel();
         int caretOffset = caretModel.getOffset();
 
-        // элемент на котором находится курсор
+        // the element with the cursor
         PsiElement element = file.findElementAt(caretOffset);
 
         HealingDto healingDto = null;

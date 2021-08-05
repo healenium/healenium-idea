@@ -99,7 +99,6 @@ public abstract class AbstractHealingAction extends AnAction {
                 .search(referenceMethod, searchScope, true)
                 .findAll();
         for (PsiReference reference : refs) {
-            // выражение, где используется наш метод поиска
             PsiMethodCallExpression expression = PsiTreeUtil.getParentOfType(reference.getElement(), PsiMethodCallExpression.class);
             if (expression != null) {
                 PsiMethod targetMethod = PsiTreeUtil.getParentOfType(expression.getMethodExpression(), PsiMethod.class);
@@ -126,14 +125,14 @@ public abstract class AbstractHealingAction extends AnAction {
         }
     }
 
-    protected void updateMethodLocatorValue(PsiMethodCallExpression methodCall, PsiExpression locatorExpression, PsiElement cssArgument) {
+    protected void updateMethodLocatorValue(PsiMethodCallExpression methodCall, PsiExpression locatorExpression, PsiElement argument) {
         methodCall.getArgumentList().getExpressions()[0].replace(locatorExpression);
-        methodCall.getMethodExpression().getReferenceNameElement().replace(cssArgument);
+        methodCall.getMethodExpression().getReferenceNameElement().replace(argument);
     }
 
-    protected void updateAnnotationLocatorValue(PsiAnnotation methodCall, PsiExpression locatorExpression, PsiElement cssArgument) {
+    protected void updateAnnotationLocatorValue(PsiAnnotation methodCall, PsiExpression locatorExpression, PsiElement argument) {
         ((PsiNameValuePair) methodCall.getAttributes().get(0)).setValue(locatorExpression);
-        ((PsiNameValuePair) methodCall.getAttributes().get(0)).getNameIdentifier().replace(cssArgument);
+        ((PsiNameValuePair) methodCall.getAttributes().get(0)).getNameIdentifier().replace(argument);
     }
 
     protected void healingResultNotification() {
