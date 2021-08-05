@@ -1,6 +1,7 @@
 package com.epam.healenium;
 
 import com.epam.healenium.client.HealingClient;
+import com.epam.healenium.model.ByArgumentEnum;
 import com.epam.healenium.model.HealingDto;
 import com.epam.healenium.model.HealingResultDto;
 import com.epam.healenium.popup.HealingNotifier;
@@ -115,11 +116,13 @@ public abstract class AbstractHealingAction extends AnAction {
                 .collect(Collectors.toSet());
     }
 
-    protected void updateLocatorValue(PsiElement methodCall, PsiExpression locatorExpression) {
+    protected void updateLocatorValue(PsiElement methodCall, PsiExpression locatorExpression, String type) {
         if (methodCall instanceof PsiMethodCallExpression) {
-            updateMethodLocatorValue((PsiMethodCallExpression) methodCall, locatorExpression, factory.createIdentifier("cssSelector"));
+            String text = methodCall.getFirstChild().getLastChild().getText();
+            updateMethodLocatorValue((PsiMethodCallExpression) methodCall, locatorExpression, factory.createIdentifier(text));
         } else {
-            updateAnnotationLocatorValue((PsiAnnotation) methodCall, locatorExpression, factory.createIdentifier("css"));
+            String annotationValue = ByArgumentEnum.getAnnotationValue(type);
+            updateAnnotationLocatorValue((PsiAnnotation) methodCall, locatorExpression, factory.createIdentifier(annotationValue));
         }
     }
 

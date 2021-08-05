@@ -57,9 +57,9 @@ public class GetHealingAction extends AbstractHealingAction {
     protected void updateLocators(HealingResultDto resultDto, PsiElement methodCall) {
         CommandProcessor.getInstance().executeCommand(project,
                 () -> ApplicationManager.getApplication().runWriteAction(() -> {
-                    PsiExpression locatorExpression = factory.createExpressionFromText("\""
+                    PsiExpression locatorExpression = factory. createExpressionFromText("\""
                             + resultDto.getLocator().getValue() + "\"", null);
-                    updateLocatorValue(methodCall, locatorExpression);
+                    updateLocatorValue(methodCall, locatorExpression, resultDto.getLocator().getType());
                 }), "Updated locator", null);
     }
 
