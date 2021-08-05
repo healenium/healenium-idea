@@ -2,6 +2,7 @@ package com.epam.healenium;
 
 import com.epam.healenium.model.HealingDto;
 import com.epam.healenium.model.HealingResultDto;
+import com.epam.healenium.model.Locator;
 import com.epam.healenium.popup.HealingResultPopupDialogWrapper;
 import com.epam.healenium.util.Predicates;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+@SuppressWarnings("unchecked")
 public class GetClassHealingAction extends AbstractHealingAction {
 
     public GetClassHealingAction() {
@@ -51,15 +53,15 @@ public class GetClassHealingAction extends AbstractHealingAction {
         CommandProcessor.getInstance().executeCommand(project,
                 () -> ApplicationManager.getApplication().runWriteAction(() -> {
                     for (HealingDto healingDto : healingDtoSet) {
-                        String locatorValue = healingDto.getResults().stream()
+                        Locator locator = healingDto.getResults().stream()
                                 .filter(r -> r.getCreateDate() != null)
                                 .max(Comparator.comparing(HealingResultDto::getCreateDate))
                                 .orElse(healingDto.getResults().iterator().next())
-                                .getLocator()
-                                .getValue();
+                                .getLocator();
+
                         PsiExpression locatorExpression = factory.createExpressionFromText(
-                                "\"" + locatorValue + "\"", null);
-                        updateLocatorValue(healingDto.getMethodCall(), locatorExpression);
+                                "\"" + locator.getValue() + "\"", null);
+                        updateLocatorValue(healingDto.getMethodCall(), locatorExpression, locator.getType());
                     }
                 }), "Updated Locator", null);
     }

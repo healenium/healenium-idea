@@ -34,7 +34,7 @@ public class GetHealingAction extends AbstractHealingAction {
         CaretModel caretModel = editor.getCaretModel();
         int caretOffset = caretModel.getOffset();
 
-        // элемент на котором находится курсор
+        // the element with the cursor
         PsiElement element = file.findElementAt(caretOffset);
 
         HealingDto healingDto = null;
@@ -57,9 +57,9 @@ public class GetHealingAction extends AbstractHealingAction {
     protected void updateLocators(HealingResultDto resultDto, PsiElement methodCall) {
         CommandProcessor.getInstance().executeCommand(project,
                 () -> ApplicationManager.getApplication().runWriteAction(() -> {
-                    PsiExpression locatorExpression = factory.createExpressionFromText("\""
+                    PsiExpression locatorExpression = factory. createExpressionFromText("\""
                             + resultDto.getLocator().getValue() + "\"", null);
-                    updateLocatorValue(methodCall, locatorExpression);
+                    updateLocatorValue(methodCall, locatorExpression, resultDto.getLocator().getType());
                 }), "Updated locator", null);
     }
 

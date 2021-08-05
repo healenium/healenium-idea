@@ -1,6 +1,7 @@
 package com.epam.healenium;
 
 import com.epam.healenium.client.HealingClient;
+import com.epam.healenium.model.ByArgumentEnum;
 import com.epam.healenium.model.HealingDto;
 import com.epam.healenium.model.HealingResultDto;
 import com.epam.healenium.popup.HealingNotifier;
@@ -98,7 +99,6 @@ public abstract class AbstractHealingAction extends AnAction {
                 .search(referenceMethod, searchScope, true)
                 .findAll();
         for (PsiReference reference : refs) {
-            // выражение, где используется наш метод поиска
             PsiMethodCallExpression expression = PsiTreeUtil.getParentOfType(reference.getElement(), PsiMethodCallExpression.class);
             if (expression != null) {
                 PsiMethod targetMethod = PsiTreeUtil.getParentOfType(expression.getMethodExpression(), PsiMethod.class);
@@ -115,22 +115,24 @@ public abstract class AbstractHealingAction extends AnAction {
                 .collect(Collectors.toSet());
     }
 
-    protected void updateLocatorValue(PsiElement methodCall, PsiExpression locatorExpression) {
+    protected void updateLocatorValue(PsiElement methodCall, PsiExpression locatorExpression, String type) {
         if (methodCall instanceof PsiMethodCallExpression) {
-            updateMethodLocatorValue((PsiMethodCallExpression) methodCall, locatorExpression, factory.createIdentifier("cssSelector"));
+            String text = methodCall.getFirstChild().getLastChild().getText();
+            updateMethodLocatorValue((PsiMethodCallExpression) methodCall, locatorExpression, factory.createIdentifier(text));
         } else {
-            updateAnnotationLocatorValue((PsiAnnotation) methodCall, locatorExpression, factory.createIdentifier("css"));
+            String annotationValue = ByArgumentEnum.getAnnotationValue(type);
+            updateAnnotationLocatorValue((PsiAnnotation) methodCall, locatorExpression, factory.createIdentifier(annotationValue));
         }
     }
 
-    protected void updateMethodLocatorValue(PsiMethodCallExpression methodCall, PsiExpression locatorExpression, PsiElement cssArgument) {
+    protected void updateMethodLocatorValue(PsiMethodCallExpression methodCall, PsiExpression locatorExpression, PsiElement argument) {
         methodCall.getArgumentList().getExpressions()[0].replace(locatorExpression);
-        methodCall.getMethodExpression().getReferenceNameElement().replace(cssArgument);
+        methodCall.getMethodExpression().getReferenceNameElement().replace(argument);
     }
 
-    protected void updateAnnotationLocatorValue(PsiAnnotation methodCall, PsiExpression locatorExpression, PsiElement cssArgument) {
+    protected void updateAnnotationLocatorValue(PsiAnnotation methodCall, PsiExpression locatorExpression, PsiElement argument) {
         ((PsiNameValuePair) methodCall.getAttributes().get(0)).setValue(locatorExpression);
-        ((PsiNameValuePair) methodCall.getAttributes().get(0)).getNameIdentifier().replace(cssArgument);
+        ((PsiNameValuePair) methodCall.getAttributes().get(0)).getNameIdentifier().replace(argument);
     }
 
     protected void healingResultNotification() {
