@@ -1,6 +1,7 @@
 package com.epam.healenium.client;
 
 import com.epam.healenium.model.HealingDto;
+import com.epam.healenium.settings.HealeniumSettingsState;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -21,21 +22,13 @@ public class HealingClient {
             .registerModule(new JavaTimeModule())
             .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
-    private String host = "localhost";
-    private Integer port = 7878;
-
     public HealingClient() {
-    }
-
-    public HealingClient(String host, Integer port) {
-        this.host = host;
-        this.port = port;
     }
 
     public Set<HealingDto> makeCall(String selector, String className){
         try{
-            //TODO: Need add config UI section
-            HttpUrl.Builder urlBuilder = HttpUrl.parse("http://"+ host+":"+port+"/healenium/healing").newBuilder();
+            String serverUrl = HealeniumSettingsState.getInstance().getServerUrl();
+            HttpUrl.Builder urlBuilder = HttpUrl.parse(serverUrl + "/healenium/healing").newBuilder();
             urlBuilder.addQueryParameter("locator", selector);
             urlBuilder.addQueryParameter("className", className);
             String url = urlBuilder.build().toString();

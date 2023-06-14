@@ -17,15 +17,8 @@ import com.intellij.psi.PsiFile;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashSet;
-import java.util.Set;
-
 @Slf4j
 public class GetHealingAction extends AbstractHealingAction {
-
-    public GetHealingAction() {
-        super();
-    }
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
