@@ -57,11 +57,11 @@ public abstract class AbstractHealingAction extends AnAction {
         String className = method != null
                 // receive full class name
                 ? method.getContainingClass().getQualifiedName()
-                // пreceive full class name. because method is null, so we on the top level and no need run the tree.
+                // receive full class name. because method is null, so we on the top level and no need run the tree.
                 : PsiTreeUtil.getParentOfType(element, PsiMember.class).getContainingClass().getQualifiedName();
 
         // get Healed locators
-        Set<HealingDto> data = new HealingClient().makeCall(locator, className);
+        Set<HealingDto> data = new HealingClient().makeCall(locator, null);
         filterNonSuccessHealingResults(data);
 
         if (data.isEmpty()) return null;

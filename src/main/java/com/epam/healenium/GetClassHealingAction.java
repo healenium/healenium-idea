@@ -25,10 +25,6 @@ import java.util.Set;
 @SuppressWarnings("unchecked")
 public class GetClassHealingAction extends AbstractHealingAction {
 
-    public GetClassHealingAction() {
-        super();
-    }
-
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
         PsiFile file = e.getData(CommonDataKeys.PSI_FILE);

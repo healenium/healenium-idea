@@ -23,26 +23,26 @@ public class Utils {
         return text == null || text.trim().length() == 0;
     }
 
-    /**
-     * @param filePath
-     * @param project
-     */
-    public static void openFileInPanel(final String filePath, final Project project) {
-        ApplicationManager.getApplication().invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                VirtualFile file = LocalFileSystem.getInstance().refreshAndFindFileByPath(filePath);
-                if (file != null && file.isValid()) {
-                    FileEditorProvider[] providers = FileEditorProviderManager.getInstance()
-                            .getProviders(project, file);
-                    if (providers.length != 0) {
-                        OpenFileDescriptor descriptor = new OpenFileDescriptor(project, file);
-                        FileEditorManager.getInstance(project).openTextEditor(descriptor, false);
-                    }
-                }
-            }
-        });
-    }
+//    /**
+//     * @param filePath
+//     * @param project
+//     */
+//    public static void openFileInPanel(final String filePath, final Project project) {
+//        ApplicationManager.getApplication().invokeLater(new Runnable() {
+//            @Override
+//            public void run() {
+//                VirtualFile file = LocalFileSystem.getInstance().refreshAndFindFileByPath(filePath);
+//                if (file != null && file.isValid()) {
+//                    FileEditorProvider[] providers = FileEditorProviderManager.getInstance()
+//                            .getProviders(project, file);
+//                    if (providers.length != 0) {
+//                        OpenFileDescriptor descriptor = new OpenFileDescriptor(project, file);
+//                        FileEditorManager.getInstance(project).openTextEditor(descriptor, false);
+//                    }
+//                }
+//            }
+//        });
+//    }
 
     /**
      *
