@@ -1,7 +1,7 @@
 package com.epam.healenium.model;
 
-import lombok.Data;
-import lombok.experimental.Accessors;
+import com.epam.healenium.util.CustomDeserializer;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import java.time.LocalDateTime;
 
@@ -10,6 +10,7 @@ public class HealingResultDto {
     private Locator locator;
     private Double score;
     private boolean successHealing;
+    @JsonDeserialize(using = CustomDeserializer.class)
     private LocalDateTime createDate;
 
     public Locator getLocator() {

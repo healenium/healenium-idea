@@ -11,11 +11,11 @@ To perform updates in code just click with right button on failed locator and se
 After this select new locator with highest score in dropdown list
 ![](https://i.imgur.com/ov8o9Lt.png)
 
-**Last version (1.0.5) released on 25.01.2021**
+**Last version (1.2.0) released on 01.05.2024**
 
 Install it automatically from IntelliJ Idea plugin repository.
 
-Tested and supports IntelliJ versions: 2020.1
+Tested and supports IntelliJ versions: 2024.1
 
 Installation
 ------------

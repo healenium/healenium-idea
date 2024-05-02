@@ -24,7 +24,6 @@ import com.intellij.psi.search.ProjectScope;
 import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.search.searches.MethodReferencesSearch;
 import com.intellij.psi.util.PsiTreeUtil;
-import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -40,8 +39,7 @@ public abstract class AbstractHealingAction extends AnAction {
     protected int count = 0;
 
     public AbstractHealingAction() {
-        super(StringUtils.EMPTY, StringUtils.EMPTY,
-                new ImageIcon(AbstractHealingAction.class.getClassLoader().getResource("icon/healenium.png")));
+        super("", "", new ImageIcon(AbstractHealingAction.class.getClassLoader().getResource("icon/healenium.png")));
         notifier = new HealingNotifier();
     }
 
